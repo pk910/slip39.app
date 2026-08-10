@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Free offline tool to split a BIP39 wallet mnemonic (seed phrase) into SLIP-0039 Shamir secret sharing shares and recover it from a quorum. Trezor-compatible, runs 100% locally in your browser, no network access, open source.">
+  <title>SLIP39.app — split &amp; restore BIP39 mnemonics with Shamir secret sharing, fully offline</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='13' font-size='13'%3E%F0%9F%94%90%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="privacy">
+  <noscript><p class="noscript">This tool runs entirely in your browser and requires JavaScript. It makes no network connections.</p></noscript>
+
+  <header>
+    <div class="brand">
+      <h1>SLIP39<span>.app</span></h1>
+      <p class="tagline">Split &amp; restore BIP39 mnemonics with SLIP-0039 Shamir shares — fully offline</p>
+    </div>
+    <div class="header-status">
+      <label class="privacy-toggle" title="Blurs mnemonics, shares and keys unless hovered or focused — protects against screen sharing, recordings and onlookers. Note: no web page can block OS screenshots outright.">
+        <input type="checkbox" id="privacy-toggle" checked> privacy blur
+      </label>
+      <span id="conn-pill" class="pill">checking…</span>
+      <button id="wipe-btn" class="danger" title="Overwrite all secrets held by this page and clear every field">Wipe session</button>
+    </div>
+  </header>
+
+  <div id="online-warning" class="banner warn-banner hidden">
+    ⚠ Your device appears to be <strong>online</strong>. This page cannot make network connections
+    (blocked by its Content-Security-Policy), but for handling real keys you should
+    <strong>disconnect from the internet</strong> (airplane mode / unplug) before entering secrets,
+    and reboot after use.
+  </div>
+  <div id="check-warning" class="banner error-banner hidden"></div>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="intro">Intro</button>
+    <button class="tab" data-tab="generate">Generate</button>
+    <button class="tab" data-tab="split">Split</button>
+    <button class="tab" data-tab="recover">Recover</button>
+    <button class="tab" data-tab="info">Info</button>
+  </nav>
+
+  <main>
+    <!-- ============================= INTRO ============================== -->
+    <section class="tab-panel prose" id="tab-intro">
+      <h2>Split your wallet backup into shares — none of which can steal your coins</h2>
+      <p>
+        A BIP39 mnemonic (the 12 or 24 “seed phrase” words behind almost every crypto
+        wallet) is a single point of failure: anyone who finds it controls all your funds,
+        and if it burns, floods or fades, your funds are gone with it.
+        <strong>Shamir's Secret Sharing</strong> fixes both problems at once — this tool
+        splits your mnemonic into up to 16 shares, of which any chosen quorum
+        (for example <em>3&nbsp;of&nbsp;5</em>) restores the original, while fewer shares reveal
+        <em>mathematically nothing</em> about it.
+      </p>
+
+      <details class="faq">
+        <summary>How it works</summary>
+        <p>
+          Your mnemonic's underlying entropy becomes the constant term of a random polynomial
+          over a finite field; each share is one point on that polynomial. With fewer points
+          than the threshold, every possible secret remains equally likely — this is
+          information-theoretic security, not just “hard to crack”. The share format is
+          <strong>SLIP-0039</strong>, the SatoshiLabs standard also used by Trezor hardware
+          wallets, so your shares are portable across implementations. Each share carries its
+          own checksum, and the share set embeds a digest so recovery can prove the shares are
+          consistent and complete. The legacy <strong>Shamir39</strong> format
+          (iancoleman.io/shamir39) is supported for recovering older share sets.
+        </p>
+      </details>
+
+      <details class="faq">
+        <summary>What you can do here</summary>
+        <ul>
+          <li><strong>Generate</strong> — create a fresh 12/24-word BIP39 mnemonic. Randomness
+            mixes your operating system's CSPRNG with over 1024 bits of entropy gathered from
+            your own mouse movement, so no single source has to be trusted.</li>
+          <li><strong>Split</strong> — turn an existing mnemonic into an n-of-m SLIP-0039
+            (or legacy Shamir39) share set, with an automatic self-check that recombines a
+            random quorum before you rely on it.</li>
+          <li><strong>Recover</strong> — paste shares (format auto-detected, validated as you
+            type) to restore the mnemonic, then verify it by deriving known addresses.</li>
+          <li><strong>Info</strong> — inspect any mnemonic: account xpubs and first addresses
+            for Bitcoin (legacy, wrapped and native SegWit), Ethereum, TRON and Solana, plus a
+            resolver for arbitrary derivation paths.</li>
+        </ul>
+      </details>
+
+      <details class="faq">
+        <summary>How to use it safely</summary>
+        <ol>
+          <li>Verify the file hash (see the security status below), then go
+            <strong>offline</strong> — airplane mode or unplug. The page cannot make network
+            connections either way, but defense works in layers.</li>
+          <li><strong>Generate</strong> a new mnemonic, or bring your existing one.</li>
+          <li><strong>Split</strong> it — pick how many shares to create (m) and how many are
+            needed to recover (n). Write each share on paper or steel; avoid the clipboard
+            and printers.</li>
+          <li>Distribute the shares to separate places or people. No single share (below the
+            threshold) is a risk on its own.</li>
+          <li>Do a <strong>recovery drill</strong> with a throwaway mnemonic first, and
+            confirm the derived addresses match your wallet before trusting any backup.</li>
+          <li>When done: <strong>Wipe session</strong>, close the tab, reboot.</li>
+        </ol>
+      </details>
+
+      <details class="faq">
+        <summary>Why you can trust it — and why you shouldn't, blindly</summary>
+        <p>
+          <strong>No web page that handles wallet keys deserves blind trust — including this
+          one.</strong> Instead of asking for your trust, this tool is built so you can
+          replace trust with verification:
+        </p>
+        <ul>
+          <li><strong>Read the code.</strong> The full source lives at
+            <a href="https://github.com/pk910/slip39.app" target="_blank" rel="noopener noreferrer">github.com/pk910/slip39.app</a>
+            — plain, readable JavaScript with zero dependencies: no frameworks, no CDNs, no
+            package manager, nothing loaded at runtime. There is no build tooling that could
+            inject code; what you audit is what runs.</li>
+          <li><strong>Verify the file you're using.</strong> The release is a single HTML
+            file. Compare its hash — <code>sha256sum index.html</code> — against
+            <code>SHA256SUMS</code> in the repository. Inside the file, CSP hashes
+            additionally pin the inline script and stylesheet to the byte.</li>
+          <li><strong>Reproduce the release.</strong> The build is a deterministic
+            concatenation of the audited source files (<code>node scripts/build-release.mjs</code>,
+            Node built-ins only). Clone the repository, build it yourself, and diff your
+            output against the published file.</li>
+          <li><strong>Run the test suite.</strong> <code>npm test</code> pins every
+            cryptographic primitive to the official test vectors of its specification
+            (SLIP-0039, BIP-32/39/84, SLIP-0010, RFC 8032 and more) — no installs needed.</li>
+          <li><strong>Watch it at runtime.</strong> A strict Content-Security-Policy makes
+            network requests impossible (check the Network tab of your browser's dev tools —
+            it stays empty), and the security status below reports tampered browser
+            built-ins.</li>
+        </ul>
+        <p>
+          If you cannot audit it yourself, ask someone you trust to, or use it only from an
+          offline, freshly booted machine with a clean browser profile — and rehearse with a
+          throwaway mnemonic before ever touching a real one.
+        </p>
+      </details>
+
+      <details class="faq">
+        <summary>What happens if some shares are lost or stolen?</summary>
+        <p>Lost: as long as any n of your m shares survive, you can recover — that's the
+        point of choosing n &lt; m. Stolen: an attacker with fewer than n shares learns
+        nothing at all; consider re-splitting and re-distributing if a share is exposed.</p>
+      </details>
+      <details class="faq">
+        <summary>Is this compatible with Trezor?</summary>
+        <p>Yes — shares are standard SLIP-0039 and can be entered during Trezor recovery.
+        Note the direction matters: this tool splits the mnemonic's <em>entropy</em>, so
+        recovering on other tools yields the same BIP39 mnemonic, not a different wallet.</p>
+      </details>
+      <details class="faq">
+        <summary>What does the SLIP39 passphrase do?</summary>
+        <p>It encrypts the share set. By design a wrong passphrase silently produces a
+        <em>different</em>, valid-looking mnemonic (plausible deniability) — there is no
+        error message. If you use one, you must remember it exactly, and you should verify
+        recovered wallets via their derived addresses.</p>
+      </details>
+      <details class="faq">
+        <summary>Why is a 1-of-m split not allowed?</summary>
+        <p>With a threshold of 1, every single share alone reveals the secret — that's a
+        copy, not a split, and SLIP-0039 forbids it. Store multiple copies of a 1-of-1
+        share if replication is really what you want.</p>
+      </details>
+
+      <p class="hint">
+        References:
+        <a href="https://github.com/satoshilabs/slips/blob/master/slip-0039.md" target="_blank" rel="noopener noreferrer">SLIP-0039 specification</a> ·
+        <a href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki" target="_blank" rel="noopener noreferrer">BIP-0039</a> ·
+        <a href="https://en.wikipedia.org/wiki/Shamir%27s_secret_sharing" target="_blank" rel="noopener noreferrer">Shamir's Secret Sharing</a>
+        — external links; open them on your everyday machine, not while handling secrets.
+      </p>
+
+      <div class="btn-row">
+        <button class="primary" id="intro-start">Get started — generate a mnemonic →</button>
+      </div>
+    </section>
+
+    <!-- ============================ GENERATE ============================ -->
+    <section class="tab-panel hidden" id="tab-generate">
+      <h2>Generate a new mnemonic</h2>
+      <p class="hint">
+        Creates a fresh BIP39 mnemonic. Randomness comes from your operating system's CSPRNG
+        <em>mixed with</em> at least 1024 bits of entropy you provide by moving your mouse —
+        the 256-bit pool is re-mixed continuously through SHA-256, and neither source alone
+        determines the result.
+      </p>
+
+      <div class="form-row">
+        <label for="gen-words">Mnemonic length</label>
+        <select id="gen-words">
+          <option value="12">12 words (128-bit)</option>
+          <option value="24" selected>24 words (256-bit)</option>
+        </select>
+      </div>
+
+      <div id="entropy-box">
+        <div id="entropy-area" tabindex="0">
+          <div id="entropy-pool" aria-hidden="true">
+            <div class="entropy-line"><span id="entropy-buffer-line" data-secret></span></div>
+            <div class="entropy-line"><b>pool</b><span id="entropy-pool-line" data-secret></span></div>
+          </div>
+          <canvas id="entropy-canvas"></canvas>
+          <span id="entropy-area-label">Move your mouse (or draw with your finger) inside this box<br>until the bar is full</span>
+        </div>
+        <div class="progress"><div id="entropy-bar"></div></div>
+        <div id="entropy-status" class="hint">collected 0 of 256 bits of user entropy</div>
+      </div>
+
+      <button id="gen-btn" class="primary" disabled>Generate mnemonic</button>
+
+      <div id="gen-result" class="result-box hidden">
+        <h3>Your new mnemonic</h3>
+        <ol id="gen-mnemonic" class="word-grid" data-secret></ol>
+        <div class="btn-row">
+          <button id="gen-copy">Copy to clipboard</button>
+          <button id="gen-to-split" class="primary">Split this mnemonic →</button>
+        </div>
+        <p class="warn-text">
+          ⚠ Anyone with these words controls the derived keys. Prefer splitting into SLIP39 shares
+          over storing the plain mnemonic. Note that the system clipboard can be read by other
+          applications — writing by hand is safer than copying.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============================== SPLIT ============================= -->
+    <section class="tab-panel hidden" id="tab-split">
+      <h2>Split a mnemonic into shares</h2>
+      <p class="hint">
+        The entropy behind your BIP39 mnemonic is split into Shamir shares.
+        Any <em>threshold</em> of them restores the mnemonic; fewer reveal nothing.
+      </p>
+
+      <div class="form-row">
+        <label for="split-input">BIP39 mnemonic (12 or 24 words)</label>
+        <textarea id="split-input" rows="3" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="enter or paste your mnemonic words…"></textarea>
+        <div id="split-validation" class="validation"></div>
+      </div>
+
+      <div class="form-row cols">
+        <label>Share format
+          <select id="split-scheme">
+            <option value="slip39" selected>SLIP-0039 (recommended)</option>
+            <option value="shamir39">Shamir39 (legacy)</option>
+          </select>
+        </label>
+        <label>Total shares (m)
+          <select id="split-count"></select>
+        </label>
+        <label>Required to recover (n)
+          <select id="split-threshold"></select>
+        </label>
+      </div>
+      <p class="hint" id="split-scheme-hint">
+        SLIP-0039 shares carry per-share checksums and a cross-share digest and are compatible
+        with Trezor and other SLIP-0039 implementations.
+      </p>
+
+      <details class="advanced" id="split-slip39-options">
+        <summary>Advanced options (SLIP-0039)</summary>
+        <div class="form-row">
+          <label for="split-passphrase">SLIP39 passphrase (optional)</label>
+          <input id="split-passphrase" type="password" autocomplete="off">
+          <p class="hint">⚠ A different passphrase silently recovers a <em>different</em> mnemonic
+          (plausible deniability by design). If you set one, you must remember it — there is no error
+          message for a wrong passphrase.</p>
+        </div>
+        <div class="form-row">
+          <label for="split-exponent">PBKDF2 iteration exponent</label>
+          <select id="split-exponent">
+            <option value="0">0 — 10,000 iterations (fastest)</option>
+            <option value="1" selected>1 — 20,000 iterations (default)</option>
+            <option value="2">2 — 40,000 iterations</option>
+            <option value="3">3 — 80,000 iterations (slowest)</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="checkbox"><input id="split-extendable" type="checkbox">
+            Extendable backup flag (allows adding groups later; requires newer SLIP39 implementations)</label>
+        </div>
+      </details>
+
+      <button id="split-btn" class="primary" disabled>Split into shares</button>
+      <div id="split-verify" class="validation"></div>
+      <div id="split-result" class="share-list" data-secret></div>
+    </section>
+
+    <!-- ============================= RECOVER ============================ -->
+    <section class="tab-panel hidden" id="tab-recover">
+      <h2>Recover a mnemonic from shares</h2>
+      <p class="hint">
+        Enter one share per field — the format (SLIP-0039 or legacy Shamir39) is detected
+        automatically, each share is validated as you type, and once the first share reveals
+        how many are required, the matching number of fields appears. You can also paste all
+        shares at once (one per line) into any field and they will be distributed.
+        Recovery additionally verifies the shares' consistency and the BIP39 checksum of
+        the result.
+      </p>
+
+      <div class="form-row">
+        <label>Shares (SLIP-0039 or Shamir39)</label>
+        <div id="rec-inputs" class="share-inputs"></div>
+        <div id="rec-status" class="validation"></div>
+      </div>
+
+      <div class="form-row" id="rec-pass-row">
+        <label for="rec-passphrase">SLIP39 passphrase (only if one was set when splitting)</label>
+        <input id="rec-passphrase" type="password" autocomplete="off">
+      </div>
+
+      <button id="rec-btn" class="primary" disabled>Recover mnemonic</button>
+
+      <div id="rec-result" class="result-box hidden">
+        <div id="rec-integrity" class="validation"></div>
+        <h3>Recovered mnemonic</h3>
+        <ol id="rec-mnemonic" class="word-grid" data-secret></ol>
+        <div class="btn-row"><button id="rec-copy">Copy to clipboard</button></div>
+
+        <h3>Verify with derived addresses</h3>
+        <p class="hint">
+          The recovered mnemonic is loaded as the active mnemonic in the Info tab — check
+          there that the derived addresses match the wallet you expect before trusting the
+          recovery. Derivation happens entirely on this device.
+        </p>
+        <div class="btn-row">
+          <button id="rec-derive">View addresses &amp; keys in the Info tab →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== INFO ============================== -->
+    <section class="tab-panel hidden" id="tab-info">
+      <h2>Wallet info</h2>
+      <p class="hint">
+        Account extended public keys and the first two receiving addresses for common
+        derivation paths of the mnemonic below. Everything is derived on this device.
+        Note: an extended public key reveals <em>all</em> addresses of its account —
+        treat it as private data.
+      </p>
+      <div class="form-row">
+        <label for="info-input">Mnemonic to derive from</label>
+        <textarea id="info-input" rows="3" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="prefilled when you generate, split or recover — or paste any BIP39 mnemonic…"></textarea>
+        <div id="info-validation" class="validation"></div>
+      </div>
+      <p id="info-active" class="hint"></p>
+      <div class="form-row">
+        <label for="info-passphrase">BIP39 passphrase for derivation (optional, a.k.a. “25th word”)</label>
+        <input id="info-passphrase" type="password" autocomplete="off">
+      </div>
+      <button id="info-derive" class="primary">Derive addresses &amp; keys</button>
+      <div id="info-content" data-secret></div>
+
+      <h3>Custom derivation path</h3>
+      <p class="hint">
+        Resolve any BIP32 path for the mnemonic above (<code>'</code> or <code>h</code> marks
+        hardened). Shown are the extended public key at the path and the addresses for the
+        path itself plus its first two children (<code>path/0</code>, <code>path/1</code>).
+        Solana uses SLIP-0010 ed25519: every segment must be hardened (e.g.
+        <code>m/44'/501'/0'/0'</code>) and there are no extended public keys.
+      </p>
+      <div class="form-row cols">
+        <label class="grow">Derivation path
+          <input id="info-custom-path" type="text" autocomplete="off" spellcheck="false" placeholder="m/44'/0'/0'/0" value="m/44'/0'/0'/0">
+        </label>
+        <label>Address type
+          <select id="info-custom-type">
+            <option value="p2pkh">BTC Legacy (P2PKH)</option>
+            <option value="p2sh-p2wpkh">BTC Wrapped SegWit (P2SH)</option>
+            <option value="p2wpkh" selected>BTC Native SegWit (bech32)</option>
+            <option value="eth">Ethereum (EIP-55)</option>
+            <option value="tron">TRON (TRC-20)</option>
+            <option value="solana">Solana (ed25519)</option>
+          </select>
+        </label>
+      </div>
+      <button id="info-custom-resolve">Resolve path</button>
+      <div id="info-custom-validation" class="validation"></div>
+      <div id="info-custom-result" data-secret></div>
+    </section>
+
+  </main>
+
+  <dialog class="modal" id="security-modal">
+    <div class="modal-head">
+      <h2>Security status</h2>
+      <button id="security-modal-close" title="Close">✕</button>
+    </div>
+
+    <h3>Connection</h3>
+    <p id="sec-conn" class="hint"></p>
+    <p class="hint">
+      This page ships a strict Content-Security-Policy with <code>connect-src 'none'</code> and
+      <code>default-src 'none'</code>: scripts cannot fetch, XHR, open WebSockets, send beacons or
+      load any external resource. CSP cannot stop you from <em>navigating away</em>, so still keep
+      the device offline while secrets are on screen.
+    </p>
+
+    <h3>Runtime integrity checks</h3>
+    <p class="hint">Detects tampered browser built-ins (e.g. by a malicious extension) that could
+      weaken randomness or leak keys:</p>
+    <ul id="sec-checks" class="check-list"></ul>
+
+    <h3>File integrity</h3>
+    <p class="hint">
+      Release builds are a <strong>single self-contained HTML file</strong>. Verify its SHA-256
+      hash against <code>SHA256SUMS</code> from the source repository
+      (<a href="https://github.com/pk910/slip39.app" target="_blank" rel="noopener noreferrer">github.com/pk910/slip39.app</a>)
+      before use: <code>sha256sum index.html</code>. The inline script and stylesheet are
+      additionally pinned by CSP hashes inside the file itself, and the release can be
+      reproduced deterministically from source with <code>node scripts/build-release.mjs</code>.
+    </p>
+
+    <h3>Privacy blur with decoys</h3>
+    <p class="hint">
+      When enabled (default, toggle in the header), secrets — mnemonics and shares — are
+      blurred unless you hover, focus or tap them. While blurred, the page does
+      not merely blur the real words — it displays <strong>same-shape garbage</strong>
+      (random wordlist words / randomized key characters), so even AI de-blurring of a
+      screenshot or recording yields nothing. This shields secrets from screen sharing,
+      recordings, periodic captures by other software and onlookers, and everything
+      re-masks automatically the moment this window loses focus. Honest limitation: no
+      web page can block OS-level screenshots — anything you deliberately reveal can be
+      captured at that moment.
+    </p>
+
+    <h3>Wiping secrets</h3>
+    <p class="hint">
+      “Wipe session” overwrites all internal secret buffers, clears every input field and removes
+      rendered secrets from the page. JavaScript cannot guarantee that the browser holds no stale
+      copies in memory, so after handling real keys: wipe, <strong>close this tab</strong>, and
+      ideally reboot the machine.
+    </p>
+    <button id="wipe-btn-2" class="danger">Wipe session now</button>
+  </dialog>
+
+  <footer>
+    <p>
+      SLIP-0039 · runs 100% locally · no cookies · no storage · no network ·
+      <a href="https://github.com/pk910/slip39.app" target="_blank" rel="noopener noreferrer">source code</a> —
+      audit &amp; verify before use with real funds ·
+      <span id="app-version"></span>
+    </p>
+    <p><button id="sec-status" class="linklike">security checks running…</button></p>
+  </footer>
+
+  <script src="js/lib/util.js"></script>
+  <script src="js/lib/webcrypto.js"></script>
+  <script src="js/lib/keccak256.js"></script>
+  <script src="js/lib/ripemd160.js"></script>
+  <script src="js/lib/secp256k1.js"></script>
+  <script src="js/lib/bech32.js"></script>
+  <script src="js/lib/base58.js"></script>
+  <script src="js/lib/ed25519.js"></script>
+  <script src="js/lib/slip10.js"></script>
+  <script src="js/lib/slip39-wordlist.js"></script>
+  <script src="js/lib/bip39-wordlist.js"></script>
+  <script src="js/lib/bip39.js"></script>
+  <script src="js/lib/bip32.js"></script>
+  <script src="js/schemes/slip39/gf256.js"></script>
+  <script src="js/schemes/slip39/rs1024.js"></script>
+  <script src="js/schemes/slip39/cipher.js"></script>
+  <script src="js/schemes/slip39/shamir.js"></script>
+  <script src="js/schemes/slip39/share.js"></script>
+  <script src="js/schemes/slip39/index.js"></script>
+  <script src="js/schemes/shamir39/index.js"></script>
+  <script src="js/app/wallet.js"></script>
+  <script src="js/app/entropy.js"></script>
+  <script src="js/app/security.js"></script>
+  <script src="js/app/ui.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "slip39.app",
+  "version": "1.0.0",
+  "description": "Offline SLIP-0039 mnemonic split & restore tool",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test test/",
+    "build": "node scripts/build-release.mjs",
+    "serve": "python3 -m http.server 8039"
+  }
+}

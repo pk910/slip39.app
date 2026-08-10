@@ -1,0 +1,195 @@
+{
+  "comment": "Reference vectors generated once with @noble/hashes 2.3.0 + @scure/bip32 2.3.0 (audited) before removing npm deps. Do not regenerate blindly.",
+  "keccak256": [
+    {
+      "len": 0,
+      "hash": "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
+    },
+    {
+      "len": 1,
+      "hash": "bc36789e7a1e281436464229828f817d6612f7b477d66591ff96a9e064bcc98a"
+    },
+    {
+      "len": 55,
+      "hash": "797f92d5e159d80a886c0a7802a255b475a1e8e473e8cf4345144824a2aee79c"
+    },
+    {
+      "len": 56,
+      "hash": "0d0bf4902a749dee22eae5f1b6e2b867ba696ce9be7632eba14315ac09bd1856"
+    },
+    {
+      "len": 63,
+      "hash": "eed42da65350e8490c201e15dd3bdb8aeaab8618692db71db386a19b6578c59d"
+    },
+    {
+      "len": 64,
+      "hash": "002030bde3d4cf89919649775cd71875c4d0ab1708a380e03fefc3a28aa24831"
+    },
+    {
+      "len": 135,
+      "hash": "cbdfd9dee5faad3818d6b06f95a219fd290b0e1706f6a82e5a595b9ce9faca62"
+    },
+    {
+      "len": 136,
+      "hash": "7ce759f1ab7f9ce437719970c26b0a66ff11fe3e38e17df89cf5d29c7d7f807e"
+    },
+    {
+      "len": 137,
+      "hash": "ac73d4fae68b8453f764007c1a20ce95994187861f0c3227a3a8e99a73a3b1db"
+    },
+    {
+      "len": 200,
+      "hash": "bfb0aa97863e797943cf7c33bb7e880bb4543f3d2703c0923c6901c2af57b890"
+    },
+    {
+      "len": 1000,
+      "hash": "aca79e4146e30eb1c733f6d6060d72471c36ea4e01ebf45d7f4916249c2bbd82"
+    }
+  ],
+  "ripemd160": [
+    {
+      "len": 0,
+      "hash": "9c1185a5c5e9fc54612808977ee8f548b2258d31"
+    },
+    {
+      "len": 1,
+      "hash": "c81b94933420221a7ac004a90242d8b1d3e5070d"
+    },
+    {
+      "len": 55,
+      "hash": "3c86963b3ff646a65ae42996e9664c747cc7e5e6"
+    },
+    {
+      "len": 56,
+      "hash": "ebdd79cfd4fd9949ef8089673d2620427f487cfb"
+    },
+    {
+      "len": 63,
+      "hash": "6d31d3d634b4a7aa15914c239576eb1956f2d9a4"
+    },
+    {
+      "len": 64,
+      "hash": "2581f5e9f957b44b0fa24d31996de47409dd1e0f"
+    },
+    {
+      "len": 135,
+      "hash": "ab1fcd5b0f8bdfd7d7f57a71bf33f341349b7d74"
+    },
+    {
+      "len": 136,
+      "hash": "5970a6c0b0e1f4cc14dd22f49f9e8c52e0fa6817"
+    },
+    {
+      "len": 137,
+      "hash": "8d935bcb852111d2abb5e9dcdd51124a07575688"
+    },
+    {
+      "len": 200,
+      "hash": "c315823ea8fe07a2dd18de4e545255afe3af0738"
+    },
+    {
+      "len": 1000,
+      "hash": "603d0d8e28f2d5f4f1dd75118d90f209d44f23d2"
+    }
+  ],
+  "hash160": [],
+  "eth_pubkeys": [],
+  "reference_keys": {
+    "m/44'/0'/0'/0/0": {
+      "privateKey": "e284129cc0922579a535bbf4d1a3b25773090d28c909bc0fed73b5e0222cc372",
+      "publicKeyCompressed": "03aaeb52dd7494c361049de67cc680e83ebcbbbdbeb13637d92cd845f70308af5e",
+      "hash160": "d986ed01b7a22225a70edbf2ba7cfb63a15cb3aa"
+    },
+    "m/44'/0'/0'/0/1": {
+      "privateKey": "5c1141f60edd3095579529db7e88d964cb0a9ec0f814f6a10cd5cbd763078a0c",
+      "publicKeyCompressed": "02dfcaec532010d704860e20ad6aff8cf3477164ffb02f93d45c552dadc70ed24f",
+      "hash160": "6ae1301cf44ca525751d1763ac4fef12d1153986"
+    },
+    "m/84'/0'/0'/0/0": {
+      "privateKey": "4604b4b710fe91f584fff084e1a9159fe4f8408fff380596a604948474ce4fa3",
+      "publicKeyCompressed": "0330d54fd0dd420a6e5f8d3624f5f3482cae350f79d5f0753bf5beef9c2d91af3c",
+      "hash160": "c0cebcd6c3d3ca8c75dc5ec62ebe55330ef910e2"
+    },
+    "m/84'/0'/0'/0/1": {
+      "privateKey": "2fd0affa51529f940a358ec0c50de81267d0bf5158ca61887347676946362c5b",
+      "publicKeyCompressed": "03e775fd51f0dfb8cd865d9ff1cca2a158cf651fe997fdc9fee9c1d3b5e995ea77",
+      "hash160": "9c90f934ea51fa0f6504177043e0908da6929983"
+    },
+    "m/44'/60'/0'/0/0": {
+      "privateKey": "1ab42cc412b618bdea3a599e3c9bae199ebf030895b039e9db1e30dafb12b727",
+      "publicKeyCompressed": "0237b0bb7a8288d38ed49a524b5dc98cff3eb5ca824c9f9dc0dfdb3d9cd600f299",
+      "hash160": "4418d0b4d9c1ef0e53dfb99143677e1e52354622"
+    },
+    "m/44'/60'/0'/0/1": {
+      "privateKey": "9a983cb3d832fbde5ab49d692b7a8bf5b5d232479c99333d0fc8e1d21f1b55b6",
+      "publicKeyCompressed": "039fd0991d0222b4e1339c1a1a5b5f6d9f6a96672a3247b638ee6156d9ea877a2f",
+      "hash160": "b25302e4b2137f3d86cf55048b7c4d7d838e845d"
+    }
+  },
+  "reference_seed": "5eb00bbddcf069084889a8ab9155568165f5c453ccb85e70811aaed6f6da5fc19a5ac40b389cd370d086206dec8aa6c43daea6690f20ad3d8d48b2d2ce9e38e4",
+  "comment2": "accounts/bip49/bip32_spec_xpubs generated with @scure/bip32 2.3.0 (validated against the BIP84 spec zpub) before adding the Info tab.",
+  "accounts": {
+    "m/44'/0'/0'": {
+      "kind": "xpub",
+      "extendedPublicKey": "xpub6BosfCnifzxcFwrSzQiqu2DBVTshkCXacvNsWGYJVVhhawA7d4R5WSWGFNbi8Aw6ZRc1brxMyWMzG3DSSSSoekkudhUd9yLb6qx39T9nMdj"
+    },
+    "m/49'/0'/0'": {
+      "kind": "ypub",
+      "extendedPublicKey": "ypub6Ww3ibxVfGzLrAH1PNcjyAWenMTbbAosGNB6VvmSEgytSER9azLDWCxoJwW7Ke7icmizBMXrzBx9979FfaHxHcrArf3zbeJJJUZPf663zsP"
+    },
+    "m/84'/0'/0'": {
+      "kind": "zpub",
+      "extendedPublicKey": "zpub6rFR7y4Q2AijBEqTUquhVz398htDFrtymD9xYYfG1m4wAcvPhXNfE3EfH1r1ADqtfSdVCToUG868RvUUkgDKf31mGDtKsAYz2oz2AGutZYs"
+    },
+    "m/44'/60'/0'": {
+      "kind": "xpub",
+      "extendedPublicKey": "xpub6DCoCpSuQZB2jawqnGMEPS63ePKWkwWPH4TU45Q7LPXWuNd8TMtVxRrgjtEshuqpK3mdhaWHPFsBngh5GFZaM6si3yZdUsT8ddYM3PwnATt"
+    }
+  },
+  "bip49_addresses": {
+    "m/49'/0'/0'/0/0": "37VucYSaXLCAsxYyAPfbSi9eh4iEcbShgf",
+    "m/49'/0'/0'/0/1": "3LtMnn87fqUeHBUG414p9CWwnoV6E2pNKS"
+  },
+  "bip49_keys": {
+    "m/49'/0'/0'/0/0": {
+      "privateKey": "508c73a06f6b6c817238ba61be232f5080ea4616c54f94771156934666d38ee3",
+      "publicKeyCompressed": "039b3b694b8fc5b5e07fb069c783cac754f5d38c3e08bed1960e31fdb1dda35c24"
+    },
+    "m/49'/0'/0'/0/1": {
+      "privateKey": "464c5dd427dcf1e2791b97a1aa9348647d3a55e1223b4e58cb663b49fd12e0ca",
+      "publicKeyCompressed": "022a421fa4a65a87d1c3e4238155d85f7bd2c5bb87632f331b5722f110586aa198"
+    }
+  },
+  "bip32_spec_xpubs": {
+    "vector1 m": "xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8",
+    "vector1 m/0'/1/2'/2/1000000000": "xpub6H1LXWLaKsWFhvm6RVpEL9P4KfRZSW7abD2ttkWP3SSQvnyA8FSVqNTEcYFgJS2UaFcxupHiYkro49S8yGasTvXEYBVPamhGW6cFJodrTHy"
+  },
+  "comment3": "ed25519_pubkeys/solana generated with @noble/ed25519 3.0.0 + ed25519-hd-key 1.3.0 (independent implementations) before adding Solana/TRON support.",
+  "ed25519_pubkeys": [
+    {
+      "secret": "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60",
+      "public": "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a"
+    },
+    {
+      "secret": "4ccd089b28ff96da9db6c346ec114e0f5b8a319f35aba624da8cf6ed4fb8a6fb",
+      "public": "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c"
+    },
+    {
+      "secret": "c5aa8df43f9f837bedb7442f31dcb7b166d38535076f094b85ce3a2e0b4458f7",
+      "public": "fc51cd8e6218a1a38da47ed00230f0580816ed13ba3303ac5deb911548908025"
+    },
+    {
+      "secret": "0000000000000000000000000000000000000000000000000000000000000000",
+      "public": "3b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29"
+    },
+    {
+      "secret": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "public": "76a1592044a6e4f511265bca73a604d90b0529d1df602be30a19a9257660d1f5"
+    }
+  ],
+  "solana": {
+    "m/44'/501'/0'/0'": "HAgk14JpMQLgt6rVgv7cBQFJWFto5Dqxi472uT3DKpqk",
+    "m/44'/501'/1'/0'": "Hh8QwFUA6MtVu1qAoq12ucvFHNwCcVTV7hpWjeY1Hztb",
+    "m/44'/501'/0'": "GjJyeC1r2RgkuoCWMyPYkCWSGSGLcz266EaAkLA27AhL"
+  }
+}

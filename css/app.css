@@ -1,0 +1,545 @@
+/* slip39.app — hand-written vanilla CSS, dark security-tool theme */
+:root {
+  --bg: #0d1117;
+  --bg-raised: #161b22;
+  --bg-inset: #010409;
+  --border: #30363d;
+  --text: #e6edf3;
+  --text-dim: #9198a1;
+  --accent: #4493f8;
+  --accent-strong: #1f6feb;
+  --ok: #3fb950;
+  --warn: #d29922;
+  --error: #f85149;
+  --mono: ui-monospace, 'SFMono-Regular', 'JetBrains Mono', Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { background: var(--bg); }
+
+body {
+  margin: 0 auto;
+  padding: 0 1rem 3rem;
+  max-width: 60rem;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.55 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.noscript { padding: 2rem; text-align: center; color: var(--warn); }
+
+/* ---------- header ---------- */
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 0 1rem;
+}
+h1 { margin: 0; font-size: 1.6rem; letter-spacing: 0.02em; }
+h1 span { color: var(--accent); }
+.tagline { margin: 0.15rem 0 0; color: var(--text-dim); font-size: 0.85rem; }
+.header-status { display: flex; align-items: center; gap: 0.75rem; }
+
+.pill {
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--border);
+}
+.pill.online { color: var(--error); border-color: var(--error); background: rgba(248, 81, 73, 0.1); }
+.pill.offline { color: var(--ok); border-color: var(--ok); background: rgba(63, 185, 80, 0.1); }
+
+/* ---------- banners ---------- */
+.banner {
+  padding: 0.7rem 1rem;
+  margin: 0.25rem 0 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+.warn-banner { background: rgba(210, 153, 34, 0.12); border: 1px solid rgba(210, 153, 34, 0.55); }
+.error-banner { background: rgba(248, 81, 73, 0.12); border: 1px solid rgba(248, 81, 73, 0.55); }
+
+/* ---------- tabs ---------- */
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.tab {
+  padding: 0.55rem 1.1rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-dim);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--text); border-bottom-color: var(--accent); }
+
+.tab-panel { padding-top: 1.25rem; }
+.tab-panel h2 { margin: 0 0 0.5rem; font-size: 1.25rem; }
+.tab-panel h3 { margin: 1.5rem 0 0.5rem; font-size: 1.05rem; }
+
+.hint { color: var(--text-dim); font-size: 0.88rem; margin: 0.4rem 0 1rem; }
+.hint code { font-family: var(--mono); font-size: 0.82rem; color: var(--text); }
+.warn-text { color: var(--warn); font-size: 0.85rem; }
+
+/* ---------- forms ---------- */
+.form-row { margin: 0 0 1rem; }
+.form-row.cols {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+.form-row.cols label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0;
+  flex: 0 1 auto;
+}
+.form-row.cols label.grow { flex: 1 1 18rem; }
+.form-row.cols label.grow input { width: 100%; }
+label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 0.3rem; }
+label.checkbox { display: flex; gap: 0.5rem; align-items: baseline; font-weight: 400; }
+
+select, input[type="password"], input[type="text"], textarea {
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  background: var(--bg-inset);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+}
+.form-row.cols select, .form-row.cols input { width: auto; min-width: 9rem; }
+textarea { font-family: var(--mono); font-size: 0.88rem; resize: vertical; }
+select:focus, input:focus, textarea:focus, button:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 1px;
+}
+
+button {
+  padding: 0.55rem 1.1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-raised);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+button:hover:not(:disabled) { border-color: var(--text-dim); }
+button.primary { background: var(--accent-strong); border-color: var(--accent-strong); }
+button.primary:hover:not(:disabled) { background: var(--accent); }
+button.danger { color: var(--error); border-color: rgba(248, 81, 73, 0.5); background: none; }
+button.danger:hover { background: rgba(248, 81, 73, 0.12); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.75rem; }
+
+.advanced { margin: 0 0 1rem; border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 1rem; }
+.advanced summary { cursor: pointer; font-weight: 600; font-size: 0.9rem; color: var(--text-dim); }
+.advanced[open] summary { margin-bottom: 0.75rem; }
+
+/* ---------- entropy collector ---------- */
+#entropy-box { margin: 1.25rem 0; }
+#entropy-area {
+  position: relative;
+  height: 13.5rem;
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  touch-action: none;
+  overflow: hidden;
+  cursor: crosshair;
+}
+#entropy-area.done { border-color: var(--ok); border-style: solid; }
+#entropy-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+#entropy-area-label { position: relative; z-index: 2; pointer-events: none; padding: 0 1rem; text-shadow: 0 0 6px var(--bg), 0 0 12px var(--bg); }
+/* live view of the collection mechanics: raw sample buffer filling
+   left-to-right, then absorbed into the 256-bit SHA-256 pool */
+#entropy-pool {
+  position: absolute;
+  inset: 0;
+  padding: 0.6rem 0.75rem;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  text-align: left;
+  opacity: 0.28;
+}
+.entropy-line {
+  font-family: var(--mono);
+  font-size: 0.84rem;
+  line-height: 1.55;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.4rem;
+}
+.entropy-line span { display: block; white-space: pre; }
+.entropy-line b {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+#entropy-buffer-line { color: var(--text-dim); }
+#entropy-pool-line { color: var(--accent); }
+
+.progress {
+  height: 0.6rem;
+  margin-top: 0.6rem;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+#entropy-bar {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--accent-strong), var(--ok));
+  transition: width 0.15s ease-out;
+}
+
+/* ---------- results ---------- */
+.result-box {
+  margin-top: 1.5rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.result-box h3:first-child { margin-top: 0; }
+
+.word-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.4rem 0.6rem;
+  margin: 0.75rem 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: word;
+}
+.word-grid li {
+  counter-increment: word;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--mono);
+  font-size: 0.92rem;
+  padding: 0.32rem 0.6rem;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+.word-grid li::before {
+  content: counter(word);
+  flex: none;
+  min-width: 1.7em;
+  padding-right: 0.55rem;
+  border-right: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- share cards ---------- */
+.share-list { margin-top: 1.25rem; display: grid; gap: 1rem; }
+.share-card {
+  padding: 0.9rem 1.1rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.share-card .share-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+.share-card .share-head strong { font-size: 0.95rem; }
+.share-card .share-head .share-scheme { color: var(--text-dim); font-size: 0.78rem; font-weight: 400; margin-left: 0.5rem; }
+.share-card .share-head button { padding: 0.25rem 0.7rem; font-size: 0.8rem; }
+.share-card .word-grid {
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  margin: 0;
+}
+.share-card .word-grid li { font-size: 0.85rem; padding: 0.26rem 0.5rem; }
+
+/* ---------- recover share inputs ---------- */
+.share-inputs { display: grid; gap: 0.75rem; }
+.share-input-row textarea {
+  width: 100%;
+  resize: none; /* height is managed automatically to fit the share */
+  overflow: hidden;
+}
+.share-input-row.ok textarea { border-color: rgba(63, 185, 80, 0.55); }
+.share-input-row.err textarea { border-color: rgba(248, 81, 73, 0.55); }
+.share-input-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+.share-input-head label { margin-bottom: 0.25rem; }
+.share-input-status { font-size: 0.8rem; color: var(--text-dim); text-align: right; }
+.share-input-status.ok { color: var(--ok); }
+.share-input-status.err { color: var(--error); }
+
+/* ---------- validation / checks ---------- */
+.validation { font-size: 0.86rem; margin-top: 0.4rem; min-height: 1.2em; }
+.validation .ok { color: var(--ok); }
+.validation .err { color: var(--error); }
+.validation .warn { color: var(--warn); }
+.validation ul { margin: 0.25rem 0 0; padding-left: 1.25rem; }
+
+.check-list { list-style: none; padding: 0; margin: 0.5rem 0 1rem; }
+.check-list li {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  padding: 0.3rem 0;
+  font-size: 0.88rem;
+  border-bottom: 1px solid var(--bg-raised);
+}
+.check-list .mark { font-weight: 700; }
+.check-list .mark.ok { color: var(--ok); }
+.check-list .mark.fail { color: var(--error); }
+.check-list .detail { color: var(--text-dim); font-size: 0.8rem; }
+
+/* ---------- info tab ---------- */
+.info-section { margin-top: 1.5rem; }
+.info-section h3 { margin: 0 0 0.4rem; }
+.info-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.info-head h3 { margin: 0; }
+.xpub-head { margin: 0.5rem 0 0; }
+.xpub-line {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.45rem 0 0.25rem;
+}
+.xpub-line .xpub-full { flex: 1; min-width: 0; }
+.xpub-kind {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.22rem 0.5rem;
+}
+.xpub-full {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.45rem 0.6rem;
+}
+
+/* small inline copy icon */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0.3rem;
+  border-radius: 5px;
+  cursor: pointer;
+  color: var(--text-dim);
+  line-height: 1;
+  vertical-align: middle;
+}
+.icon-btn:hover { color: var(--accent); background: var(--bg-raised); }
+.icon-btn svg { width: 14px; height: 14px; display: block; }
+.addr-table .icon-btn { padding: 0.15rem; margin-left: 0.35rem; }
+.addr-table .icon-btn svg { width: 12px; height: 12px; }
+
+/* ---------- address table ---------- */
+.addr-table {
+  width: 100%;
+  table-layout: fixed; /* identical column widths across all sections */
+  border-collapse: collapse;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+}
+.addr-table th, .addr-table td { text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--border); }
+.addr-table th:first-child, .addr-table td:first-child { width: 11.5rem; }
+.addr-table th { color: var(--text-dim); font-weight: 600; }
+.addr-table td.addr { font-family: var(--mono); overflow-wrap: anywhere; }
+.addr-table-wrap { overflow-x: auto; }
+
+/* ---------- security modal ---------- */
+dialog.modal {
+  margin: auto;
+  background: var(--bg-raised);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  max-width: 44rem;
+  width: calc(100% - 2rem);
+  max-height: calc(100dvh - 4rem);
+  overflow-y: auto;
+}
+dialog.modal::backdrop { background: rgba(1, 4, 9, 0.75); }
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+.modal-head h2 { margin: 0; font-size: 1.2rem; }
+.modal-head button { padding: 0.25rem 0.6rem; }
+dialog.modal h3 { margin: 1.25rem 0 0.4rem; font-size: 1rem; }
+
+/* ---------- footer ---------- */
+footer { margin-top: 3rem; border-top: 1px solid var(--border); padding-top: 1rem; }
+footer p { color: var(--text-dim); font-size: 0.8rem; margin: 0.3rem 0; }
+footer a { color: var(--accent); text-decoration: underline dotted; text-underline-offset: 3px; }
+dialog.modal a { color: var(--accent); }
+
+.linklike {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  font-weight: 400;
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+.linklike:hover { color: var(--text); }
+.linklike.ok { color: var(--ok); }
+.linklike.fail { color: var(--error); font-weight: 700; }
+
+/* ---------- intro / prose ---------- */
+.prose p, .prose li { font-size: 0.95rem; }
+.prose ul, .prose ol { padding-left: 1.4rem; }
+.prose li { margin: 0.3rem 0; }
+.prose a { color: var(--accent); }
+.faq {
+  margin: 0.5rem 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 1rem;
+}
+.faq summary { cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+.faq p { margin: 0.6rem 0 0.2rem; color: var(--text-dim); font-size: 0.9rem; }
+.faq ul, .faq ol { margin: 0.6rem 0 0.2rem; }
+.faq li { color: var(--text-dim); font-size: 0.9rem; }
+.faq li strong, .faq p strong { color: var(--text); }
+
+/* ---------- privacy decoys ---------- */
+/* While blurred, sensitive areas display same-shape garbage (the .decoy
+   layer) instead of the real content — de-blurring a screenshot yields
+   nothing. Reveal: hover, focus, or tap (touch). This shields against
+   screen sharing, recordings and onlookers; it cannot block OS-level
+   screenshots of deliberately revealed content. */
+.decoy-wrap { position: relative; }
+.decoy-wrap:focus { outline: none; }
+.decoy-wrap > .decoy {
+  display: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--bg);
+}
+/* blur only the decoy CONTENT: blurring the overlay itself would give it
+   soft translucent edges through which the real value underneath shows */
+.decoy-wrap > .decoy > * { filter: blur(7px); }
+.decoy-wrap > .decoy.on-raised { background: var(--bg-raised); }
+.decoy-wrap > .decoy.decoy-text {
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 0.65rem;
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  color: var(--text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+/* word-grid wraps: spacing lives on the wrap so the real grid and the decoy
+   grid align pixel-perfectly (no margin collapse mismatch, no jump) */
+.decoy-wrap.grid-wrap { margin: 0.75rem 0; }
+.decoy-wrap.grid-wrap .word-grid { margin: 0; }
+.decoy-wrap > .decoy-hint {
+  display: none;
+  position: absolute;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  text-shadow: 0 0 8px var(--bg);
+}
+body.privacy .decoy-wrap.active > .decoy { display: block; }
+body.privacy .decoy-wrap.active > .decoy-hint { display: flex; }
+body.privacy .decoy-wrap.active:hover > .decoy,
+body.privacy .decoy-wrap.active:focus-within > .decoy,
+body.privacy .decoy-wrap.active.revealed > .decoy,
+body.privacy .decoy-wrap.active:hover > .decoy-hint,
+body.privacy .decoy-wrap.active:focus-within > .decoy-hint,
+body.privacy .decoy-wrap.active.revealed > .decoy-hint { display: none; }
+/* while the window is unfocused, decoys always cover — hover/focus state
+   can linger while another application is in the foreground */
+body.privacy.unfocused .decoy-wrap.active > .decoy { display: block !important; }
+body.privacy.unfocused .decoy-wrap.active > .decoy-hint { display: flex !important; }
+
+.privacy-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-dim);
+  margin: 0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.privacy-toggle:hover { color: var(--text); }
+
+.hidden { display: none !important; }
+
+@media (max-width: 40rem) {
+  header { flex-direction: column; align-items: flex-start; }
+  .tabs { overflow-x: auto; }
+}
