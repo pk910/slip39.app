@@ -13,6 +13,26 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// Usage: node scripts/build-release.mjs [--version vX.Y.Z] [--date YYYY-MM-DD]
+// With both flags the output is fully deterministic: building the same tag
+// with the same flags yields byte-identical files (the basis for verifying a
+// published release by rebuilding it locally). CI passes the tag name and the
+// tag's commit date; without flags this is a "dev build" stamped with today.
+const argv = process.argv.slice(2);
+const argValue = (name) => {
+  const i = argv.indexOf(name);
+  return i !== -1 && argv[i + 1] ? argv[i + 1] : null;
+};
+const version = argValue('--version');
+const buildDate = argValue('--date') || new Date().toISOString().slice(0, 10);
+const commit = argValue('--commit'); // dev builds: stamp the commit for traceability
+if (version && !/^v?\d+\.\d+\.\d+(-[\w.]+)?$/.test(version)) {
+  throw new Error(`implausible version "${version}" — expected e.g. v1.2.0`);
+}
+const buildLabel = version
+  ? `release ${version} (${buildDate})`
+  : `dev build ${buildDate}${commit ? ` · ${commit.slice(0, 7)}` : ''}`;
+
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(path.join(root, p), 'utf8');
 const sha256hex = (data) => createHash('sha256').update(data).digest('hex');
@@ -61,10 +81,9 @@ html = html.replace(
 );
 
 // stamp the build
-const buildDate = new Date().toISOString().slice(0, 10);
 html = html.replace(
   /<span id="app-version">[^<]*<\/span>/,
-  `<span id="app-version">release build ${buildDate} — verify: sha256sum index.html vs SHA256SUMS</span>`
+  `<span id="app-version">${buildLabel} — verify: sha256sum index.html vs SHA256SUMS</span>`
 );
 
 mkdirSync(path.join(root, 'dist'), { recursive: true });
@@ -97,6 +116,7 @@ writeFileSync(
 `
 );
 
+console.log(`build                ${buildLabel}`);
 console.log(`dist/index.html      ${(html.length / 1024).toFixed(1)} KiB`);
 console.log(`sha256               ${releaseHash}`);
 console.log(`script CSP hash      ${scriptHash}`);

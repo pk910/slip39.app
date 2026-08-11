@@ -1,0 +1,57 @@
+# Release: on a v* tag, build with the version baked in and publish a GitHub
+# Release with the artifact and its hashes.
+#
+# SECURITY MODEL — this workflow does NOT deploy:
+# There are no Cloudflare credentials anywhere in this repository or its
+# secrets. Production deployment is done manually by a maintainer from their
+# own machine (see README "Deploying"), after rebuilding this tag locally and
+# comparing hashes against this release — the build is deterministic given
+# (--version, --date). A compromised GitHub account can therefore publish a
+# tampered release asset, but cannot touch the production site, and tampering
+# is caught by the local rebuild-and-compare step.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write # create the GitHub release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify VERSION file matches the tag
+        run: |
+          test "$(cat VERSION)" = "${GITHUB_REF_NAME}" || {
+            echo "VERSION file ($(cat VERSION)) does not match tag (${GITHUB_REF_NAME})"; exit 1; }
+
+      - name: Run test suite (official vectors)
+        run: npm test
+
+      - name: Build release (version + tag commit date baked in)
+        run: |
+          TAG_DATE="$(git log -1 --format=%cs)"
+          echo "Building ${GITHUB_REF_NAME} (${TAG_DATE})"
+          node scripts/build-release.mjs --version "${GITHUB_REF_NAME}" --date "${TAG_DATE}"
+          echo "TAG_DATE=${TAG_DATE}" >> "$GITHUB_ENV"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          HASH="$(sha256sum dist/index.html | cut -d' ' -f1)"
+          gh release create "${GITHUB_REF_NAME}" \
+            dist/index.html dist/SHA256SUMS dist/_headers \
+            --title "slip39.app ${GITHUB_REF_NAME}" \
+            --notes "$(printf 'Self-contained release build.\n\n**sha256(index.html):** \`%s\`\n\nVerify by rebuilding deterministically:\n\n```sh\ngit checkout %s\nnode scripts/build-release.mjs --version %s --date %s\nsha256sum dist/index.html   # must match the hash above\n```\n\nProduction deployment requires manual approval in the Cloudflare dashboard (automatic production deployments are disabled there); no Cloudflare credentials are stored on GitHub.' "$HASH" "${GITHUB_REF_NAME}" "${GITHUB_REF_NAME}" "${TAG_DATE}")"
+
+      - name: Fast-forward the release branch to this tag
+        # Cloudflare Pages watches the `release` branch as its production
+        # branch — but with automatic production deployments DISABLED there,
+        # so updating this branch stages the release; shipping it requires a
+        # manual approval in the Cloudflare dashboard (the second factor).
+        run: git push --force origin "HEAD:refs/heads/release"

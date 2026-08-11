@@ -1,0 +1,28 @@
+# CI: test + build on every push/PR. Never deploys anything.
+# Deliberately minimal action surface: only actions/checkout, no setup-node
+# (the runner's preinstalled Node >= 20 is sufficient), no third-party actions.
+# For maximal supply-chain rigor, pin actions/checkout to a commit SHA.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run test suite (official vectors)
+        run: npm test
+
+      - name: Build (dev stamp)
+        run: node scripts/build-release.mjs
+
+      - name: Show artifact hash
+        run: sha256sum dist/index.html && cat dist/SHA256SUMS

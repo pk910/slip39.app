@@ -127,24 +127,47 @@ Clipboard use is discouraged in-UI (other apps can read it).
   source loads as-is; there is no build/transpile step, what you audit is what runs.
 - **Tests**: `npm test` (Node's built-in runner, no installs).
 
-## Deploying to slip39.app
+## Releases & deploying to slip39.app
 
-Serve `dist/index.html` and `dist/_headers` (Cloudflare Pages / Netlify header syntax).
-For nginx, mirror the same headers:
+**Security model: GitHub cannot deploy production.** The repository holds no Cloudflare
+credentials — a compromised GitHub account can at worst publish a tampered release
+asset, never touch the live site. The second factor is the Cloudflare account itself
+(its own login + 2FA), used only from a maintainer's machine.
 
-```nginx
-location / {
-    root /var/www/slip39.app;
-    add_header Content-Security-Policy "default-src 'none'; script-src 'sha256-…'; style-src 'sha256-…'; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-ancestors 'none'" always;
-    add_header X-Content-Type-Options nosniff always;
-    add_header X-Frame-Options DENY always;
-    add_header Referrer-Policy no-referrer always;
-    add_header Cross-Origin-Opener-Policy same-origin always;
-    add_header Cache-Control no-store always;
-}
+**Release (automated, GitHub Actions):** pushing a tag `vX.Y.Z` runs the full vector
+test suite, builds with the version and the tag's commit date baked in
+(`node scripts/build-release.mjs --version vX.Y.Z --date <commit-date>` — fully
+deterministic: same tag + flags ⇒ byte-identical output), and publishes a GitHub
+Release with `index.html`, `SHA256SUMS` and `_headers`. Pushes to `main` only run CI;
+nothing deploys.
+
+**Hosting (Cloudflare Pages, git-integrated):** the Pages project builds every branch
+as a *preview* on `*.slip39-app.pages.dev` (dev builds, commit-stamped), and uses the
+`release` branch as its production branch — but with **automatic production
+deployments disabled**. Tagging `vX.Y.Z` makes the release workflow fast-forward
+`release` to the tag, which only *stages* the release; shipping it to slip39.app is a
+one-click manual approval in the Cloudflare dashboard, behind the Cloudflare login and
+its 2FA. Before approving, glance that the staged commit SHA equals the tag
+(`git rev-parse vX.Y.Z` or the commit page on GitHub) — that closes the loop against a
+compromised GitHub account pushing something else to `release`.
+
+Cloudflare build command (Settings → Build):
+
+```sh
+if [ "$CF_PAGES_BRANCH" = "release" ]; then node scripts/build-release.mjs --version "$(cat VERSION)" --date "$(git log -1 --format=%cs)"; else node scripts/build-release.mjs --commit "$CF_PAGES_COMMIT_SHA"; fi
 ```
 
-(The exact CSP hashes are printed by `npm run build` and written into `dist/_headers`.)
+Build output directory: `dist`. The generated `dist/_headers` applies the CSP +
+security headers on every deployment.
+
+**Release flow:** bump `VERSION` (must equal the tag — the workflow enforces it),
+commit, `git tag vX.Y.Z && git push origin main vX.Y.Z`, wait for the GitHub release,
+then approve the production deployment in the Cloudflare dashboard.
+
+Recommended extras on GitHub: require signed tags, tag protection for `v*`, 2FA —
+layers on top; the load-bearing wall is that production needs the Cloudflare login.
+For self-hosting with nginx instead, mirror the headers from `dist/_headers` via
+`add_header` (the exact CSP hashes are printed by `npm run build`).
 
 ## Notes on SLIP-0039 semantics
 
