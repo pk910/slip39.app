@@ -1,0 +1,15 @@
+// Cloudflare Worker config: assets-only (no Worker script) serving dist/.
+// Deploys are staged as VERSIONS (wrangler versions upload) — promoting a
+// version to production is a manual approval in the Cloudflare dashboard.
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "slip39-app",
+  "compatibility_date": "2026-08-01",
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "single-page-application"
+  },
+  "workers_dev": true,
+  "preview_urls": true
+}

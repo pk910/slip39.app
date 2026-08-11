@@ -141,28 +141,35 @@ deterministic: same tag + flags ⇒ byte-identical output), and publishes a GitH
 Release with `index.html`, `SHA256SUMS` and `_headers`. Pushes to `main` only run CI;
 nothing deploys.
 
-**Hosting (Cloudflare Pages, git-integrated):** the Pages project builds every branch
-as a *preview* on `*.slip39-app.pages.dev` (dev builds, commit-stamped), and uses the
-`release` branch as its production branch — but with **automatic production
-deployments disabled**. Tagging `vX.Y.Z` makes the release workflow fast-forward
-`release` to the tag, which only *stages* the release; shipping it to slip39.app is a
-one-click manual approval in the Cloudflare dashboard, behind the Cloudflare login and
-its 2FA. Before approving, glance that the staged commit SHA equals the tag
-(`git rev-parse vX.Y.Z` or the commit page on GitHub) — that closes the loop against a
-compromised GitHub account pushing something else to `release`.
+**Hosting (Cloudflare Workers Builds, git-integrated):** the Worker (`wrangler.jsonc`,
+assets-only, serving `dist/`) builds every push, but **every build only uploads a
+staged *version*** (`npx wrangler versions upload`) with its own preview URL on
+`*.slip39-app.<account>.workers.dev` — nothing ever auto-deploys to production.
+Shipping a release to slip39.app is a one-click **promotion of the chosen version in
+the Cloudflare dashboard** (Worker → Deployments), behind the Cloudflare login and its
+2FA. Tagging `vX.Y.Z` makes the release workflow fast-forward the `release` branch to
+the tag, producing the version-stamped build to promote. Before promoting, glance that
+the version's commit SHA equals the tag (GitHub's tag page shows it) — that closes the
+loop against a compromised GitHub account staging something else.
 
-Cloudflare build command (Settings → Build):
+Cloudflare build settings:
+
+- Build command (works under both Workers Builds and classic Pages variables):
 
 ```sh
-if [ "$CF_PAGES_BRANCH" = "release" ]; then node scripts/build-release.mjs --version "$(cat VERSION)" --date "$(git log -1 --format=%cs)"; else node scripts/build-release.mjs --commit "$CF_PAGES_COMMIT_SHA"; fi
+BRANCH="${CF_PAGES_BRANCH:-$WORKERS_CI_BRANCH}"; COMMIT="${CF_PAGES_COMMIT_SHA:-$WORKERS_CI_COMMIT_SHA}"; if [ "$BRANCH" = "release" ]; then node scripts/build-release.mjs --version "$(cat VERSION)" --date "$(git log -1 --format=%cs)"; else node scripts/build-release.mjs --commit "$COMMIT"; fi
 ```
 
-Build output directory: `dist`. The generated `dist/_headers` applies the CSP +
-security headers on every deployment.
+- Deploy command **and** non-production branch deploy command:
+  `npx wrangler versions upload` (never `wrangler deploy` — that would ship
+  production straight from CI).
+
+The generated `dist/_headers` applies the CSP + security headers.
 
 **Release flow:** bump `VERSION` (must equal the tag — the workflow enforces it),
 commit, `git tag vX.Y.Z && git push origin main vX.Y.Z`, wait for the GitHub release,
-then approve the production deployment in the Cloudflare dashboard.
+then promote the staged `release`-branch version to production in the Cloudflare
+dashboard (Worker → Deployments).
 
 Recommended extras on GitHub: require signed tags, tag protection for `v*`, 2FA —
 layers on top; the load-bearing wall is that production needs the Cloudflare login.
